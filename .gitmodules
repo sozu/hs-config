@@ -1,0 +1,3 @@
+[submodule "hs-validation"]
+	path = hs-validation
+	url = https://github.com/sozu/hs-validation.git

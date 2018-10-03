@@ -1,0 +1,4 @@
+.stack-work/
+hs-config.cabal
+*~
+**/.DS_Store
