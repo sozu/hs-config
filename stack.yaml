@@ -40,6 +40,7 @@ packages:
 # (e.g., acme-missiles-0.3)
 extra-deps:
 - yaml-0.10.1
+- hs-validation
 
 # Override default flag values for local packages and extra-deps
 # flags: {}

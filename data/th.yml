@@ -1,12 +1,12 @@
 string: !!null abc
 integer: 1
-double: 0.5
+#double: 0.5
 boolean: true
 intlist: [1, 2, 3]
-mapping: !!map
-  mappedType:
-    mt_string: def
-    mt_integer: 2
+#mapping: !!map
+#  mappedType:
+#    mt_string: def
+#    mt_integer: 2
 subType:
   st_string: ghi
   st_integer: 3

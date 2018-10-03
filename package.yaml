@@ -33,6 +33,7 @@ dependencies:
 - template-haskell
 - utf8-string
 - safe-exceptions
+- hs-validation
 
 library:
   source-dirs: src
@@ -58,4 +59,5 @@ tests:
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
+    - hspec
     - hs-config
