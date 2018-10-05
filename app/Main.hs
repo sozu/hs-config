@@ -13,7 +13,7 @@ import Data.Validation
 import Debug.Trace
 
 $(yamlConfiguration "data/th.yml" "Configuration" [])
-$(validatable [''Configuration, ''Configuration'subType, ''Configuration'listing])
+$(validatable [''Configuration, ''Configuration'subType, ''Configuration'listing, ''Configuration'mappedType])
 
 main :: IO ()
 main = do
@@ -24,11 +24,11 @@ main = do
         Right config -> do
             print $ string config
             print $ integer config
-            --print $ double config
+            print $ double config
             print $ boolean config
             print $ intlist config
 
-            --print $ mapping config
+            print $ mapping config
             print $ listing config
 
             print $ st_string $ subType config
