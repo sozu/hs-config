@@ -13,7 +13,6 @@ import Data.Validation
 import Debug.Trace
 
 $(yamlConfiguration "data/th.yml" "Configuration" [])
-$(validatable [''Configuration, ''Configuration'subType, ''Configuration'listing, ''Configuration'mappedType])
 
 main :: IO ()
 main = do

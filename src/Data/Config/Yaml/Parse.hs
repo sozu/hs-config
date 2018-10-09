@@ -137,7 +137,17 @@ parseObject _ (EventScalar v t s a) = do
     return struct
 parseObject n (EventMappingStart t' s' a') = parseMapping n t' a' []
 parseObject n (EventSequenceStart t' s' a') = parseSequence n t' a' []
-parseObject _ (EventAlias a') = lift $ lookupAnchor a'
+parseObject n (EventAlias a') = lift $ swapName <$> lookupAnchor a'
+    where
+        -- TODO: How to determine aliased type name ?
+        -- a: &A {a1: 1, a2: 2}
+        -- b: *A
+        -- In above case the type of record "a" is Root'a { a1 :: Integer, a2 :: Integer }
+        -- Change name of type for aliased record "b" to Root'b to avoid duplicate.
+        swapName (DataStruct _ ss) = DataStruct n ss
+        swapName (ListStruct s) = ListStruct $ swapName s
+        swapName (MapStruct s) = MapStruct $ swapName s
+        swapName s = s
 
 -- | Interpret a scalar event into an element type.
 parseScalar :: B.ByteString
@@ -171,7 +181,7 @@ parseScalar v SetTag s   = parseScalar v NoTag s
 parseScalar v SeqTag s   = parseScalar v NoTag s
 parseScalar v MapTag s   = parseScalar v NoTag s
 -- User defined type.
-parseScalar _ (UriTag uri) _ = UserElement $ reverse $ takeWhile (/= ':') (reverse uri)
+parseScalar _ (UriTag uri) _ = UserElement $ tail $ reverse $ takeWhile (/= ':') (reverse uri)
 
 -- | Checks whether the string represents null.
 isNullScalar :: B.ByteString

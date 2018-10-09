@@ -68,7 +68,7 @@ typeOf p m s
     | DataStruct name _ <- s = (makeTypeName $ append name p) >>= conT
     where
         lookupTypeName :: String -> Name
-        lookupTypeName n = let n' = tail n in maybe (mkName n') id (m M.!? n')
+        lookupTypeName n = maybe (mkName n) id (m M.!? n)
 
         elementType :: ElementType -> Q Type
         elementType StrElement = conT ''String

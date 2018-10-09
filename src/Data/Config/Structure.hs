@@ -9,11 +9,11 @@ data ElementType = StrElement -- ^ String.
                  | BoolElement -- ^ Boolean.
                  | NullableElement ElementType -- ^ Value of @ElementType@ which can be null.
                  | UserElement String -- ^ Value of user defined type.
-                 deriving (Show)
+                 deriving (Show, Eq)
 
 -- | Structure representing the data type of values in key-value representation of configuration data.
 data Structure = ScalarStruct ElementType B.ByteString -- ^ Scalar value of the @ElementType@ and original @B.ByteString@.
                | ListStruct Structure -- ^ List of the data type represented with the @Structure@.
                | MapStruct Structure -- ^ Map having string key and value represented with the @Structure@.
                | DataStruct String [(B.ByteString, Structure)] -- ^ New data type with its name and records.
-               deriving (Show)
+               deriving (Show, Eq)
