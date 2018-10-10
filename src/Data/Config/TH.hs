@@ -7,6 +7,7 @@ import GHC.Generics hiding (NoSourceUnpackedness, NoSourceStrictness)
 import Language.Haskell.TH
 import Control.Applicative
 import Control.Monad
+import qualified Data.Char as C
 import qualified Data.List as L
 import qualified Data.Map as M
 import qualified Data.ByteString as B
@@ -48,14 +49,23 @@ makeRecordKey :: B.ByteString
               -> Q Name
 makeRecordKey n = do
     let ident = UTF8.toString n
-    -- TODO: Raise error when the string is illegal for the record name.
-    return $ mkName ident
+    if isVarHead (head ident) && all isVarChar (tail ident)
+        then return $ mkName ident
+        else fail $ "'" ++ ident ++ "' is an invalid variable identifier"
+    where
+        isVarHead c = C.isLower c || c == '_' || C.generalCategory c == C.OtherLetter
+        isVarChar c = C.isLower c || C.isUpper c || C.isDigit c || c `elem` "_'" || C.generalCategory c == C.OtherLetter
 
 makeTypeName :: [String]
              -> Q Name
 makeTypeName ns = do
-    -- TODO: Raise error when the string is illegal for the type name.
-    return $ mkName $ L.intercalate "'" ns
+    let ident = L.intercalate "'" ns
+    if isConHead (head ident) && all isConChar (tail ident)
+        then return $ mkName ident
+        else fail $ "'" ++ ident ++ "' is an invalid constructor identifier"
+    where
+        isConHead c = C.isUpper c
+        isConChar c = C.isLower c || C.isUpper c || C.isDigit c || c `elem` "_'" || C.generalCategory c == C.OtherLetter
 
 typeOf :: [String]
        -> M.Map String Name -- ^ Mapping from tag string to user-defined type name.

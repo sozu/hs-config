@@ -7,6 +7,7 @@ import Test.Hspec
 import Language.Haskell.TH
 import Control.Monad
 import qualified Data.Map as M
+import qualified Data.ByteString.UTF8 as UTF8
 import Data.Config
 
 data UserDefined1
@@ -25,6 +26,68 @@ checkType d _ _ = expectationFailure $ "Unexpected data type declaration: " ++ s
 
 spec :: Spec
 spec = do
+    describe "Check names of records" $ do
+        it "Valid ascii name" $ do
+            n <- runQ $ makeRecordKey "abc"
+            nameBase n `shouldBe` "abc"
+        it "Valid name including number" $ do
+            n <- runQ $ makeRecordKey "abc1"
+            nameBase n `shouldBe` "abc1"
+        it "Valid name starting with underscore" $ do
+            n <- runQ $ makeRecordKey "_abc_"
+            nameBase n `shouldBe` "_abc_"
+        it "Valid name including single quote" $ do
+            n <- runQ $ makeRecordKey "abc'"
+            nameBase n `shouldBe` "abc'"
+        it "Valid name starting with multibyte character" $ do
+            n <- runQ $ makeRecordKey $ UTF8.fromString "あabcあ"
+            nameBase n `shouldBe` "あabcあ"
+        it "Invalid name starting with capital letter" $ do
+            runQ (makeRecordKey "Abc") `shouldThrow` anyException
+        it "Invalid name starting with number" $ do
+            runQ (makeRecordKey "1bc") `shouldThrow` anyException
+        it "Invalid name starting with single quote" $ do
+            runQ (makeRecordKey "'bc") `shouldThrow` anyException
+        it "Invalid name including symbols" $ do
+            runQ (makeRecordKey "abc#") `shouldThrow` anyException
+        it "Invalid name including space" $ do
+            runQ (makeRecordKey "abc ") `shouldThrow` anyException
+        it "Invalid name including multi byte space" $ do
+            runQ (makeRecordKey "abc　") `shouldThrow` anyException
+
+    describe "Check names of types" $ do
+        it "Valid ascii name" $ do
+            n <- runQ $ makeTypeName ["Abc"]
+            nameBase n `shouldBe` "Abc"
+        it "Valid name including number" $ do
+            n <- runQ $ makeTypeName ["Abc1"]
+            nameBase n `shouldBe` "Abc1"
+        it "Valid name including underscore" $ do
+            n <- runQ $ makeTypeName ["Abc_"]
+            nameBase n `shouldBe` "Abc_"
+        it "Valid name including single quote" $ do
+            n <- runQ $ makeTypeName ["Abc'"]
+            nameBase n `shouldBe` "Abc'"
+        it "Valid name including multibyte character" $ do
+            n <- runQ $ makeTypeName ["Abcあ"]
+            nameBase n `shouldBe` "Abcあ"
+        it "Invalid name starting with small letter" $ do
+            runQ (makeTypeName ["abc"]) `shouldThrow` anyException
+        it "Invalid name starting with number" $ do
+            runQ (makeTypeName ["1bc"]) `shouldThrow` anyException
+        it "Invalid name starting with underscore" $ do
+            runQ (makeTypeName ["_Abc"]) `shouldThrow` anyException
+        it "Invalid name starting with single quote" $ do
+            runQ (makeTypeName ["'Abc"]) `shouldThrow` anyException
+        it "Invalid name starting with multibyte character" $ do
+            runQ (makeTypeName ["あAbc"]) `shouldThrow` anyException
+        it "Invalid name including symbols" $ do
+            runQ (makeTypeName ["Abc#"]) `shouldThrow` anyException
+        it "Invalid name including space" $ do
+            runQ (makeTypeName ["Abc "]) `shouldThrow` anyException
+        it "Invalid name including multi byte space" $ do
+            runQ (makeTypeName ["Abc　"]) `shouldThrow` anyException
+
     describe "Generate data type from structure" $ do
         it "Basic data types" $ do
             ds <- runQ $ defineDataTypes [] [] $
